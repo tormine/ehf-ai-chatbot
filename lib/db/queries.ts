@@ -32,10 +32,9 @@ export async function getOrCreateDefaultUser() {
       await db.insert(user).values({
         id: DEFAULT_USER_ID,
         email: 'default@example.com',
-        password: 'not-used', // Required field
+        password: 'not-used',
       });
     }
-
     return DEFAULT_USER_ID;
   } catch (error) {
     console.error('Failed to get or create default user:', error);
@@ -76,7 +75,6 @@ export async function createUser(email: string, password: string) {
     return await db.insert(user).values({ 
       email, 
       password: hash,
-      // id will be auto-generated
     });
   } catch (error) {
     console.error('Failed to create user in database');
