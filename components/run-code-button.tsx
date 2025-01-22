@@ -12,11 +12,17 @@ import type { ConsoleOutput, ConsoleOutputContent, UIBlock } from './block';
 import { Button } from './ui/button';
 import { PlayIcon } from './icons';
 import { useBlockSelector } from '@/hooks/use-block';
-import { type PyodideInterface } from 'pyodide';
+
+// Define our own Pyodide interface
+interface PyodideInterface {
+  setStdout: (options: { batched: (output: string) => void }) => void;
+  loadPackagesFromImports: (code: string, options: { messageCallback: (message: string) => void }) => Promise<void>;
+  runPythonAsync: (code: string) => Promise<any>;
+}
 
 declare global {
   interface Window {
-    loadPyodide: () => Promise<PyodideInterface>;
+    loadPyodide: (options: { indexURL: string }) => Promise<PyodideInterface>;
   }
 }
 
