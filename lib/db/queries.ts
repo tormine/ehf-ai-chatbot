@@ -25,10 +25,15 @@ export type InsertUser = Omit<InferInsertModel<typeof user>, 'id'> & {
   id?: string;
 };
 
-export type InsertChat = Omit<InferInsertModel<typeof chat>, 'id' | 'createdAt'> & {
-  id?: string;
-  createdAt?: Date;
-};
+export type InsertChat = InferInsertModel<typeof chat>;
+
+export type InsertDocument = InferInsertModel<typeof document>;
+
+export type UpdateChat = Partial<{
+  title: string;
+  userId: string;
+  visibility: 'public' | 'private';
+}>;
 
 export async function getOrCreateDefaultUser() {
   try {
@@ -101,13 +106,10 @@ export async function saveChat({ id, userId, title }: {
   title: string;
 }) {
   try {
-    const newChat: InsertChat = {
-      id,
+    return await db.insert(chat).values({
       userId,
       title,
-      createdAt: new Date(),
-    };
-    return await db.insert(chat).values(newChat);
+    });
   } catch (error) {
     console.error('Failed to save chat');
     throw error;
@@ -212,30 +214,22 @@ export async function getVotesByChatId({ id }: { id: string }) {
   }
 }
 
-export async function saveDocument({
-  id,
-  title,
-  kind,
-  content,
-  userId,
-}: {
+export async function saveDocument({ title, kind, content = '', userId }: {
   id: string;
   title: string;
   kind: BlockKind;
-  content: string;
+  content?: string;
   userId: string;
 }) {
   try {
     return await db.insert(document).values({
-      id,
       title,
       kind,
       content,
       userId,
-      createdAt: new Date(),
     });
   } catch (error) {
-    console.error('Failed to save document in database');
+    console.error('Failed to save document');
     throw error;
   }
 }
@@ -359,17 +353,15 @@ export async function deleteMessagesByChatIdAfterTimestamp({
   }
 }
 
-export async function updateChatVisiblityById({
-  chatId,
-  visibility,
-}: {
+export async function updateChatVisibility({ chatId, visibility }: { 
   chatId: string;
-  visibility: 'private' | 'public';
+  visibility: 'public' | 'private';
 }) {
   try {
-    return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
+    const updateData: UpdateChat = { visibility };
+    return await db.update(chat).set(updateData).where(eq(chat.id, chatId));
   } catch (error) {
-    console.error('Failed to update chat visibility in database');
+    console.error('Failed to update chat visibility');
     throw error;
   }
 }

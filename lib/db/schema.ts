@@ -20,7 +20,7 @@ export const user = pgTable('User', {
 export type User = InferSelectModel<typeof user>;
 
 export const chat = pgTable('Chat', {
-  id: uuid('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   title: text('title').notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   userId: uuid('userId').references(() => user.id).notNull(),
@@ -56,7 +56,7 @@ export type Vote = InferSelectModel<typeof vote>;
 export const document = pgTable('Document', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: text('title').notNull(),
-  content: text('content'),
+  content: text('content').notNull(),
   kind: varchar('kind', { enum: ['text', 'code', 'image'] }).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   userId: uuid('userId').references(() => user.id).notNull(),
@@ -67,6 +67,7 @@ export type Document = InferSelectModel<typeof document>;
 export const suggestion = pgTable('Suggestion', {
   id: uuid('id').defaultRandom().primaryKey(),
   documentId: uuid('documentId').references(() => document.id).notNull(),
+  documentCreatedAt: timestamp('documentCreatedAt').notNull(),
   originalText: text('originalText').notNull(),
   suggestedText: text('suggestedText').notNull(),
   description: text('description'),
