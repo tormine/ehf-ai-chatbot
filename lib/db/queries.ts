@@ -72,7 +72,11 @@ export async function createUser(email: string, password: string) {
   const hash = hashSync(password, salt);
 
   try {
-    return await db.insert(user).values({ email, password: hash });
+    return await db.insert(user).values({ 
+      email, 
+      password: hash,
+      // id will be auto-generated
+    });
   } catch (error) {
     console.error('Failed to create user in database');
     throw error;

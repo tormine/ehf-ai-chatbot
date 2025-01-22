@@ -12,9 +12,9 @@ import {
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('User', {
-  id: uuid('id').primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   email: text('email').unique().notNull(),
-  password: text('password'),
+  password: text('password').notNull(),
 });
 
 export type User = InferSelectModel<typeof user>;
