@@ -12,6 +12,13 @@ import type { ConsoleOutput, ConsoleOutputContent, UIBlock } from './block';
 import { Button } from './ui/button';
 import { PlayIcon } from './icons';
 import { useBlockSelector } from '@/hooks/use-block';
+import { type PyodideInterface } from 'pyodide';
+
+declare global {
+  interface Window {
+    loadPyodide: () => Promise<PyodideInterface>;
+  }
+}
 
 const OUTPUT_HANDLERS = {
   matplotlib: `
@@ -59,6 +66,8 @@ function detectRequiredHandlers(code: string): string[] {
   return handlers;
 }
 
+let currentPyodideInstance: PyodideInterface | null = null;
+
 export function PureRunCodeButton({
   setConsoleOutputs,
 }: {
@@ -91,13 +100,9 @@ export function PureRunCodeButton({
     if (isPython) {
       try {
         if (!currentPyodideInstance) {
-          // @ts-expect-error - loadPyodide is not defined
-          const newPyodideInstance = await globalThis.loadPyodide({
+          const newPyodideInstance = await window.loadPyodide({
             indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/',
           });
-
-          setPyodide(null);
-          setPyodide(newPyodideInstance);
           currentPyodideInstance = newPyodideInstance;
         }
 
