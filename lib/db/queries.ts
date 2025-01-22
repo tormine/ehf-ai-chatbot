@@ -4,6 +4,7 @@ import { genSaltSync, hashSync } from 'bcrypt-ts';
 import { and, asc, desc, eq, gt, gte } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import { InferInsertModel } from 'drizzle-orm';
 
 import {
   user,
@@ -20,6 +21,8 @@ import { BlockKind } from '@/components/block';
 
 export const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
 
+export type NewUser = InferInsertModel<typeof user>;
+
 export async function getOrCreateDefaultUser() {
   try {
     const existingUser = await db
@@ -29,11 +32,12 @@ export async function getOrCreateDefaultUser() {
       .limit(1);
 
     if (!existingUser.length) {
-      await db.insert(user).values({
+      const defaultUser: NewUser = {
         id: DEFAULT_USER_ID,
         email: 'default@example.com',
         password: 'not-used',
-      });
+      };
+      await db.insert(user).values(defaultUser);
     }
     return DEFAULT_USER_ID;
   } catch (error) {
@@ -71,11 +75,13 @@ export async function createUser(email: string, password: string) {
   const salt = genSaltSync(10);
   const hash = hashSync(password, salt);
 
+  const newUser: NewUser = {
+    email,
+    password: hash,
+  };
+
   try {
-    return await db.insert(user).values({ 
-      email, 
-      password: hash,
-    });
+    return await db.insert(user).values(newUser);
   } catch (error) {
     console.error('Failed to create user in database');
     throw error;
