@@ -7,14 +7,16 @@ import {
   streamText,
 } from 'ai';
 import { z } from 'zod';
+import { Document } from 'langchain/document';
 
 import { auth } from '@/app/(auth)/auth';
 import { customModel, imageGenerationModel } from '@/lib/ai';
 import { models } from '@/lib/ai/models';
 import {
-  codePrompt,
-  systemPrompt,
-  updateDocumentPrompt,
+  SYSTEM_PROMPT,
+  CODE_PROMPT as codePrompt,
+  UPDATE_DOCUMENT_PROMPT as updateDocumentPrompt,
+  buildSystemPrompt,
 } from '@/lib/ai/prompts';
 import {
   deleteChatById,
@@ -40,7 +42,8 @@ type AllowedTools =
   | 'createDocument'
   | 'updateDocument'
   | 'requestSuggestions'
-  | 'getWeather';
+  | 'getWeather'
+  | 'fetchContext';
 
 const blocksTools: AllowedTools[] = [
   'createDocument',
@@ -50,7 +53,15 @@ const blocksTools: AllowedTools[] = [
 
 const weatherTools: AllowedTools[] = ['getWeather'];
 
-const allTools: AllowedTools[] = [...blocksTools, ...weatherTools];
+const allTools: AllowedTools[] = [...blocksTools, ...weatherTools, 'fetchContext'];
+
+// Remove auth checks and use a default user ID
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
+
+interface RagToolResponse {
+  results: Document[];
+  message?: string;
+}
 
 export async function POST(request: Request) {
   const {
@@ -60,11 +71,8 @@ export async function POST(request: Request) {
   }: { id: string; messages: Array<Message>; modelId: string } =
     await request.json();
 
-  const session = await auth();
-
-  if (!session || !session.user || !session.user.id) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  // Remove auth check and use default user
+  const userId = DEFAULT_USER_ID;
 
   const model = models.find((model) => model.id === modelId);
 
@@ -83,7 +91,7 @@ export async function POST(request: Request) {
 
   if (!chat) {
     const title = await generateTitleFromUserMessage({ message: userMessage });
-    await saveChat({ id, userId: session.user.id, title });
+    await saveChat({ id, userId: userId, title });
   }
 
   const userMessageId = generateUUID();
@@ -95,15 +103,27 @@ export async function POST(request: Request) {
   });
 
   return createDataStreamResponse({
-    execute: (dataStream) => {
-      dataStream.writeData({
-        type: 'user-message-id',
-        content: userMessageId,
-      });
+    execute: async (dataStream) => {
+      // Fetch relevant context first
+      let contextDocs: Document[] = [];
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/rag`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: userMessage.content }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          contextDocs = data.results;
+        }
+      } catch (error) {
+        console.error('Failed to fetch context:', error);
+      }
 
       const result = streamText({
         model: customModel(model.apiIdentifier),
-        system: systemPrompt,
+        system: buildSystemPrompt(contextDocs),
         messages: coreMessages,
         maxSteps: 5,
         experimental_activeTools: allTools,
@@ -223,13 +243,13 @@ export async function POST(request: Request) {
                 dataStream.writeData({ type: 'finish', content: '' });
               }
 
-              if (session.user?.id) {
+              if (userId) {
                 await saveDocument({
                   id,
                   title,
                   kind,
                   content: draftText,
-                  userId: session.user.id,
+                  userId: userId,
                 });
               }
 
@@ -343,13 +363,13 @@ export async function POST(request: Request) {
                 dataStream.writeData({ type: 'finish', content: '' });
               }
 
-              if (session.user?.id) {
+              if (userId) {
                 await saveDocument({
                   id,
                   title: document.title,
                   content: draftText,
                   kind: document.kind,
-                  userId: session.user.id,
+                  userId: userId,
                 });
               }
 
@@ -418,9 +438,7 @@ export async function POST(request: Request) {
                 suggestions.push(suggestion);
               }
 
-              if (session.user?.id) {
-                const userId = session.user.id;
-
+              if (userId) {
                 await saveSuggestions({
                   suggestions: suggestions.map((suggestion) => ({
                     ...suggestion,
@@ -439,9 +457,37 @@ export async function POST(request: Request) {
               };
             },
           },
+          fetchContext: {
+            description: 'Fetch relevant context from our Pinecone-based RAG route',
+            parameters: z.object({
+              query: z.string().min(1, 'Query must not be empty'),
+            }),
+            execute: async ({ query }: { query: string }): Promise<Document[]> => {
+              const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+              
+              try {
+                const response = await fetch(`${baseUrl}/api/rag`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ query }),
+                });
+
+                if (!response.ok) {
+                  const errorData = await response.json().catch(() => ({})) as { message?: string };
+                  throw new Error(errorData.message || 'Failed to fetch context');
+                }
+
+                const data = await response.json() as RagToolResponse;
+                return data.results;
+              } catch (error) {
+                console.error('Error fetching context:', error instanceof Error ? error.message : error);
+                return [];
+              }
+            },
+          },
         },
         onFinish: async ({ response }) => {
-          if (session.user?.id) {
+          if (userId) {
             try {
               const responseMessagesWithoutIncompleteToolCalls =
                 sanitizeResponseMessages(response.messages);

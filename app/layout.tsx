@@ -1,14 +1,40 @@
-import type { Metadata } from 'next';
-import { Toaster } from 'sonner';
+import { Analytics } from '@vercel/analytics/react';
+import { GeistSans } from 'geist/font/sans';
+import { Metadata } from 'next';
 
-import { ThemeProvider } from '@/components/theme-provider';
+import { Providers } from './providers';
+import { siteConfig } from '@/lib/metadata';
 
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  metadataBase: new URL(siteConfig.url),
+  authors: [{ name: 'European Handball Federation' }],
+  openGraph: {
+    title: siteConfig.name,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    images: [siteConfig.ogImage],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
 };
 
 export const viewport = {
@@ -35,11 +61,11 @@ const THEME_COLOR_SCRIPT = `\
   updateThemeColor();
 })();`;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
@@ -56,16 +82,11 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-center" />
+      <body className={GeistSans.className}>
+        <Providers>
           {children}
-        </ThemeProvider>
+          <Analytics />
+        </Providers>
       </body>
     </html>
   );

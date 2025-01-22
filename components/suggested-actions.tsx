@@ -16,24 +16,24 @@ interface SuggestedActionsProps {
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
+      title: 'Career Development',
+      label: 'How can I develop my handball coaching career?',
+      action: 'How can I develop my handball coaching career? What are the key steps and qualifications needed?',
     },
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: 'EHF Support',
+      label: 'How does the EHF support coach development?',
+      action: 'How does the EHF support handball coach development? What resources and programs are available?',
     },
     {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: 'Master Coach Course',
+      label: 'What modules are in the Master Coach course?',
+      action: 'What educational modules are included in the EHF Master Coach course? What are the main learning objectives?',
     },
     {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      title: 'Coaching Competencies',
+      label: 'What skills should a top-level coach have?',
+      action: 'What competencies and skills should a top-level handball coach have? What are the key knowledge areas?',
     },
   ];
 

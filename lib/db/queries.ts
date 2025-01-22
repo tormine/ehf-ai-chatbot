@@ -18,13 +18,43 @@ import {
 } from './schema';
 import { BlockKind } from '@/components/block';
 
-// Optionally, if not using email/pass login, you can
-// use the Drizzle adapter for Auth.js / NextAuth
-// https://authjs.dev/reference/adapter/drizzle
+export const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
 
-// biome-ignore lint: Forbidden non-null assertion.
-const client = postgres(process.env.POSTGRES_URL!);
+async function ensureDefaultUser() {
+  try {
+    const [existingUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, DEFAULT_USER_ID));
+
+    if (!existingUser) {
+      await db.insert(user).values({
+        id: DEFAULT_USER_ID,
+        email: 'default@example.com',
+        password: 'not-used',
+      });
+    }
+  } catch (error) {
+    console.error('Failed to ensure default user exists');
+    throw error;
+  }
+}
+
+if (!process.env.POSTGRES_URL) {
+  throw new Error('POSTGRES_URL is not defined');
+}
+
+// Configure postgres client with SSL
+const client = postgres(process.env.POSTGRES_URL, {
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
 const db = drizzle(client);
+
+// Ensure default user exists when module loads
+ensureDefaultUser().catch(console.error);
 
 export async function getUser(email: string): Promise<Array<User>> {
   try {
