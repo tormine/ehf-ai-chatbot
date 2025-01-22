@@ -25,6 +25,11 @@ export type InsertUser = Omit<InferInsertModel<typeof user>, 'id'> & {
   id?: string;
 };
 
+export type InsertChat = Omit<InferInsertModel<typeof chat>, 'id' | 'createdAt'> & {
+  id?: string;
+  createdAt?: Date;
+};
+
 export async function getOrCreateDefaultUser() {
   try {
     const existingUser = await db
@@ -90,24 +95,21 @@ export async function createUser(email: string, password: string) {
   }
 }
 
-export async function saveChat({
-  id,
-  userId,
-  title,
-}: {
+export async function saveChat({ id, userId, title }: { 
   id: string;
   userId: string;
   title: string;
 }) {
   try {
-    return await db.insert(chat).values({
+    const newChat: InsertChat = {
       id,
-      createdAt: new Date(),
       userId,
       title,
-    });
+      createdAt: new Date(),
+    };
+    return await db.insert(chat).values(newChat);
   } catch (error) {
-    console.error('Failed to save chat in database');
+    console.error('Failed to save chat');
     throw error;
   }
 }
