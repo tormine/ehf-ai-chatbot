@@ -5,12 +5,11 @@ import remarkGfm from 'remark-gfm';
 import { CodeBlock } from './code-block';
 
 const components: Partial<Components> = {
-  // @ts-expect-error
-  code: CodeBlock,
+  code: CodeBlock as Components['code'],
   pre: ({ children }) => <>{children}</>,
   ol: ({ node, children, ...props }) => {
     return (
-      <ol className="list-decimal list-outside ml-4" {...props}>
+      <ol className="list-decimal pl-4 my-2 ml-2" {...props}>
         {children}
       </ol>
     );
@@ -24,7 +23,7 @@ const components: Partial<Components> = {
   },
   ul: ({ node, children, ...props }) => {
     return (
-      <ul className="list-decimal list-outside ml-4" {...props}>
+      <ul className="list-disc pl-4 my-2 ml-2" {...props}>
         {children}
       </ul>
     );
@@ -107,3 +106,5 @@ export const Markdown = memo(
   NonMemoizedMarkdown,
   (prevProps, nextProps) => prevProps.children === nextProps.children,
 );
+
+export { components as markdownComponents };
