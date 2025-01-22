@@ -20,23 +20,25 @@ import { BlockKind } from '@/components/block';
 
 export const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
 
-async function ensureDefaultUser() {
+export async function getOrCreateDefaultUser() {
   try {
-    const [existingUser] = await db
+    const existingUser = await db
       .select()
       .from(user)
-      .where(eq(user.id, DEFAULT_USER_ID));
+      .where(eq(user.id, DEFAULT_USER_ID))
+      .limit(1);
 
-    if (!existingUser) {
+    if (!existingUser.length) {
       await db.insert(user).values({
         id: DEFAULT_USER_ID,
         email: 'default@example.com',
-        password: 'not-used',
       });
     }
+
+    return DEFAULT_USER_ID;
   } catch (error) {
-    console.error('Failed to ensure default user exists');
-    throw error;
+    console.error('Failed to get or create default user:', error);
+    return DEFAULT_USER_ID;
   }
 }
 
@@ -54,7 +56,7 @@ const client = postgres(process.env.POSTGRES_URL, {
 const db = drizzle(client);
 
 // Ensure default user exists when module loads
-ensureDefaultUser().catch(console.error);
+getOrCreateDefaultUser().catch(console.error);
 
 export async function getUser(email: string): Promise<Array<User>> {
   try {
