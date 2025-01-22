@@ -21,7 +21,9 @@ import { BlockKind } from '@/components/block';
 
 export const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
 
-export type NewUser = InferInsertModel<typeof user>;
+export type InsertUser = Omit<InferInsertModel<typeof user>, 'id'> & {
+  id?: string;
+};
 
 export async function getOrCreateDefaultUser() {
   try {
@@ -32,7 +34,7 @@ export async function getOrCreateDefaultUser() {
       .limit(1);
 
     if (!existingUser.length) {
-      const defaultUser: NewUser = {
+      const defaultUser: InsertUser = {
         id: DEFAULT_USER_ID,
         email: 'default@example.com',
         password: 'not-used',
@@ -75,7 +77,7 @@ export async function createUser(email: string, password: string) {
   const salt = genSaltSync(10);
   const hash = hashSync(password, salt);
 
-  const newUser: NewUser = {
+  const newUser: InsertUser = {
     email,
     password: hash,
   };
