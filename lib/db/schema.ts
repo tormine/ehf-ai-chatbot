@@ -32,9 +32,11 @@ export const chat = pgTable('Chat', {
 export type Chat = InferSelectModel<typeof chat>;
 
 export const message = pgTable('Message', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: uuid('id').primaryKey(),
   content: text('content').notNull(),
-  role: varchar('role', { enum: ['user', 'assistant', 'system', 'tool'] }).notNull(),
+  role: varchar('role', { 
+    enum: ['user', 'assistant', 'system', 'tool'] 
+  }).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   chatId: uuid('chatId').references(() => chat.id).notNull(),
 });

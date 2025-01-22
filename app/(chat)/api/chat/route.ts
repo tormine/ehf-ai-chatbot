@@ -8,6 +8,7 @@ import {
 } from 'ai';
 import { z } from 'zod';
 import { Document } from 'langchain/document';
+import { NextResponse } from 'next/server';
 
 import { auth } from '@/app/(auth)/auth';
 import { customModel, imageGenerationModel } from '@/lib/ai';
@@ -98,7 +99,19 @@ export async function POST(request: Request) {
 
   await saveMessages({
     messages: [
-      { ...userMessage, id: userMessageId, createdAt: new Date(), chatId: id },
+      {
+        id: userMessageId,
+        createdAt: new Date(),
+        chatId: id,
+        role: userMessage.role,
+        content: typeof userMessage.content === 'string' 
+          ? userMessage.content 
+          : Array.isArray(userMessage.content)
+            ? userMessage.content.map(part => 
+                typeof part === 'string' ? part : part.content
+              ).join(' ')
+            : '',
+      },
     ],
   });
 
