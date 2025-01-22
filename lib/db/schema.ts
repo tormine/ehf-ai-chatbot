@@ -12,7 +12,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('User', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: uuid('id').primaryKey(),
   email: text('email').unique().notNull(),
   password: text('password').notNull(),
 });

@@ -32,6 +32,7 @@ export async function getOrCreateDefaultUser() {
       await db.insert(user).values({
         id: DEFAULT_USER_ID,
         email: 'default@example.com',
+        password: 'not-used', // Required field
       });
     }
 
