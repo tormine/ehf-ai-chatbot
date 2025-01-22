@@ -71,8 +71,21 @@ type MessagePart = TextPart | ImagePart | FilePart;
 
 function getPartContent(part: MessagePart | string): string {
   if (typeof part === 'string') return part;
-  if ('text' in part) return part.text;
-  if ('url' in part) return part.url;
+  
+  // Type guards for each part type
+  if ('text' in part && typeof part.text === 'string') {
+    return part.text;
+  }
+  
+  if ('url' in part && typeof part.url === 'string') {
+    return part.url;
+  }
+  
+  // For file parts or any other types
+  if ('file' in part && typeof part.file.url === 'string') {
+    return part.file.url;
+  }
+  
   return '';
 }
 
