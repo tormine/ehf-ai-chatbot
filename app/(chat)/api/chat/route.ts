@@ -1,5 +1,8 @@
 import {
   type Message,
+  type TextPart,
+  type ImagePart,
+  type FilePart,
   convertToCoreMessages,
   createDataStreamResponse,
   experimental_generateImage,
@@ -64,6 +67,15 @@ interface RagToolResponse {
   message?: string;
 }
 
+type MessagePart = TextPart | ImagePart | FilePart;
+
+function getPartContent(part: MessagePart | string): string {
+  if (typeof part === 'string') return part;
+  if ('text' in part) return part.text;
+  if ('url' in part) return part.url;
+  return '';
+}
+
 export async function POST(request: Request) {
   const {
     id,
@@ -104,12 +116,10 @@ export async function POST(request: Request) {
         createdAt: new Date(),
         chatId: id,
         role: userMessage.role,
-        content: typeof userMessage.content === 'string' 
-          ? userMessage.content 
+        content: typeof userMessage.content === 'string'
+          ? userMessage.content
           : Array.isArray(userMessage.content)
-            ? userMessage.content.map(part => 
-                typeof part === 'string' ? part : part.content
-              ).join(' ')
+            ? userMessage.content.map(getPartContent).join(' ')
             : '',
       },
     ],

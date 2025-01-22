@@ -5,7 +5,6 @@ export const siteConfig = {
   ogImage: 'https://charly.homeofhandball.com/og.png',
   links: {
     ehf: 'https://www.eurohandball.com',
-    homeOfHandball: 'https://homeofhandball.com',
     twitter: 'https://twitter.com/ehf',
   },
 };
