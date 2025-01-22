@@ -10,7 +10,7 @@ import {
   streamText,
 } from 'ai';
 import { z } from 'zod';
-import { Document } from 'langchain/document';
+import { type Document } from 'langchain/document';
 import { NextResponse } from 'next/server';
 
 import { auth } from '@/app/(auth)/auth';
@@ -63,7 +63,7 @@ const allTools: AllowedTools[] = [...blocksTools, ...weatherTools, 'fetchContext
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 interface RagToolResponse {
-  results: Document[];
+  results: any[];
   message?: string;
 }
 
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
   return createDataStreamResponse({
     execute: async (dataStream) => {
       // Fetch relevant context first
-      let contextDocs: Document[] = [];
+      let contextDocs: any[] = [];
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/rag`, {
           method: 'POST',

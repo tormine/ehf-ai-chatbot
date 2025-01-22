@@ -1,4 +1,5 @@
 import { BlockKind } from '@/components/block';
+import type { Document } from 'langchain/document';
 
 export const blocksPrompt = `
 Blocks is a special user interface mode that helps users with writing, editing, and other content creation tasks. When block is open, it is on the right side of the screen, while the conversation is on the left side. When creating or updating documents, changes are reflected in real-time on the blocks and visible to the user.
@@ -110,11 +111,11 @@ ${content}
 
 Please update it based on the user's request. Maintain the same style and format.`;
 
-export function buildSystemPrompt(context: Document[]): string {
+export function buildSystemPrompt(context: Document[] | any[]): string {
   if (!context.length) return SYSTEM_PROMPT;
 
   const contextText = context
-    .map(doc => doc.pageContent)
+    .map(doc => doc.pageContent || '')
     .join('\n\n');
 
   return `${SYSTEM_PROMPT}
