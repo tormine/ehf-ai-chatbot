@@ -85,6 +85,16 @@ function getPartContent(part: MessagePart | string): string {
   return '';
 }
 
+function convertMessageContent(content: any): string {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) return content.map(getPartContent).join(' ');
+  if (content && typeof content === 'object') {
+    // Handle tool call results or other structured content
+    return JSON.stringify(content);
+  }
+  return '';
+}
+
 export async function POST(request: Request) {
   const {
     id,
@@ -539,7 +549,7 @@ export async function POST(request: Request) {
                       id: messageId,
                       chatId: id,
                       role: message.role,
-                      content: message.content,
+                      content: convertMessageContent(message.content),
                       createdAt: new Date(),
                     };
                   },
