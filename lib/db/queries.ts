@@ -106,10 +106,15 @@ export async function saveChat({ id, userId, title }: {
   title: string;
 }) {
   try {
-    return await db.insert(chat).values({
+    // First create the chat
+    await db.insert(chat).values({
+      id,  // Important: Include the id
       userId,
       title,
     });
+    
+    // Return the created chat
+    return await getChatById({ id });
   } catch (error) {
     console.error('Failed to save chat');
     throw error;
@@ -153,6 +158,15 @@ export async function getChatById({ id }: { id: string }) {
 
 export async function saveMessages({ messages }: { messages: Array<Message> }) {
   try {
+    // Verify chat exists first
+    const chatId = messages[0]?.chatId;
+    if (chatId) {
+      const existingChat = await getChatById({ id: chatId });
+      if (!existingChat) {
+        throw new Error(`Chat ${chatId} does not exist`);
+      }
+    }
+    
     return await db.insert(message).values(messages);
   } catch (error) {
     console.error('Failed to save messages in database', error);

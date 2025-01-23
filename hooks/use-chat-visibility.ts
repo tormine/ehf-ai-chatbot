@@ -1,6 +1,6 @@
 'use client';
 
-import { updateChatVisibility } from '@/app/(chat)/actions';
+import { updateVisibility } from '@/app/(chat)/actions';
 import { VisibilityType } from '@/components/visibility-selector';
 import { Chat } from '@/lib/db/schema';
 import { useMemo } from 'react';
@@ -52,10 +52,7 @@ export function useChatVisibility({
       { revalidate: false },
     );
 
-    updateChatVisibility({
-      chatId: chatId,
-      visibility: updatedVisibilityType,
-    });
+    updateVisibility(chatId, updatedVisibilityType);
   };
 
   return { visibilityType, setVisibilityType };
