@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { PlusIcon } from './icons';
 import { memo } from 'react';
 import { Message } from 'ai';
+import type { VisibilityType } from './visibility-selector';
 
 function PureChatHeader({
   chatId,
