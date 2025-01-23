@@ -1,4 +1,4 @@
-import type { InferSelectModel } from 'drizzle-orm';
+import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 import {
   pgTable,
   varchar,
@@ -77,3 +77,13 @@ export const suggestion = pgTable('Suggestion', {
 });
 
 export type Suggestion = InferSelectModel<typeof suggestion>;
+
+export type InsertUser = Omit<InferInsertModel<typeof user>, 'id'> & {
+  id?: string;
+};
+
+export type InsertChat = Omit<InferInsertModel<typeof chat>, 'createdAt'> & {
+  id: string;
+};
+
+export type InsertDocument = InferInsertModel<typeof document>;

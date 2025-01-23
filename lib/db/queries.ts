@@ -15,20 +15,13 @@ import {
   type Message,
   message,
   vote,
+  type InsertUser,
+  type InsertChat,
+  type InsertDocument,
 } from './schema';
 import { BlockKind } from '@/components/block';
 
 export const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
-
-export type InsertUser = Omit<InferInsertModel<typeof user>, 'id'> & {
-  id?: string;
-};
-
-export type InsertChat = Omit<InferInsertModel<typeof chat>, 'createdAt'> & {
-  id: string;
-};
-
-export type InsertDocument = InferInsertModel<typeof document>;
 
 export type UpdateChat = Partial<{
   title: string;
