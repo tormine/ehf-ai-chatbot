@@ -66,6 +66,7 @@ export function Chat({
           selectedModelId={selectedModelId}
           selectedVisibilityType={selectedVisibilityType}
           isReadonly={isReadonly}
+          messages={messages}
         />
 
         <Messages

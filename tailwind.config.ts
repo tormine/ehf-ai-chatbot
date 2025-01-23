@@ -19,8 +19,32 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        // EHF Brand Colors
+        brand: {
+          DEFAULT: '#1e78ff',
+          dark: '#003380',
+          'medium-dark': '#0569ff',
+          'medium-light': '#3888ff',
+          light: '#e6f0ff',
+          lighter: '#f5f9ff',
+        },
+        // Semantic colors mapped to EHF brand
+        foreground: '#001432', // dark blue for text
+        background: '#f5f9ff', // brand.lighter
+        primary: {
+          DEFAULT: '#1e78ff', // brand.DEFAULT
+          foreground: '#ffffff',
+        },
+        muted: {
+          DEFAULT: '#e6f0ff', // brand.light
+          foreground: '#003380', // brand.dark
+        },
+        accent: {
+          DEFAULT: '#1e78ff', // brand.DEFAULT
+          foreground: '#ffffff',
+        },
+        border: '#0569ff', // brand.medium-dark
+        // Keep existing system colors
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
@@ -29,27 +53,14 @@ const config: Config = {
           DEFAULT: 'hsl(var(--popover))',
           foreground: 'hsl(var(--popover-foreground))',
         },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
-        },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
-        border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         chart: {
