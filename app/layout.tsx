@@ -13,28 +13,20 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  keywords: siteConfig.seo.keywords,
+  authors: [{ name: 'EHF' }],
+  creator: 'EHF',
+  themeColor: siteConfig.seo.themeColor,
+  manifest: siteConfig.seo.manifest,
+  icons: siteConfig.seo.icons,
   metadataBase: new URL(siteConfig.url),
-  authors: [{ name: 'European Handball Federation' }],
-  openGraph: {
-    title: siteConfig.name,
-    description: siteConfig.description,
-    url: siteConfig.url,
-    siteName: siteConfig.name,
-    images: [siteConfig.ogImage],
-    type: 'website',
+  openGraph: siteConfig.social.openGraph,
+  twitter: siteConfig.social.twitter,
+  // Verification
+  verification: {
+    google: siteConfig.seo.googleSiteVerification,
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [siteConfig.ogImage],
-  },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png',
-  },
-  manifest: '/site.webmanifest',
+  robots: siteConfig.seo.robots,
 };
 
 export const viewport = {
