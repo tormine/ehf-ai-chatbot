@@ -25,7 +25,9 @@ export type InsertUser = Omit<InferInsertModel<typeof user>, 'id'> & {
   id?: string;
 };
 
-export type InsertChat = InferInsertModel<typeof chat>;
+export type InsertChat = Omit<InferInsertModel<typeof chat>, 'createdAt'> & {
+  id: string;
+};
 
 export type InsertDocument = InferInsertModel<typeof document>;
 
@@ -106,14 +108,12 @@ export async function saveChat({ id, userId, title }: {
   title: string;
 }) {
   try {
-    // First create the chat
-    await db.insert(chat).values({
-      id,  // Important: Include the id
+    const newChat: InsertChat = {
+      id,
       userId,
       title,
-    });
-    
-    // Return the created chat
+    };
+    await db.insert(chat).values(newChat);
     return await getChatById({ id });
   } catch (error) {
     console.error('Failed to save chat');
