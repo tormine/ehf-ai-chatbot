@@ -49,7 +49,7 @@ function PureChatHeader({
       {messages.length === 0 && (
         <div className="flex flex-col items-center justify-center px-4 py-8">
           <div className="max-w-2xl text-center space-y-4">
-            <h1 className="text-2xl font-bold">👋 Hi! I'm Charly</h1>
+            <h1 className="text-2xl font-bold">👋 Hi! I&apos;m Charly</h1>
             <p className="text-muted-foreground">
               I can help you understand handball coaching education, especially the RINCK Convention and EHF guidelines. Feel free to ask me anything about handball coaching or browse the example questions below!
             </p>
