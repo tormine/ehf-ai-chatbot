@@ -101,15 +101,22 @@ export function convertToUIMessages(
     if (typeof message.content === 'string') {
       textContent = message.content;
     } else if (Array.isArray(message.content)) {
-      for (const content of message.content) {
+      const contentArray = message.content as Array<{
+        type: 'text' | 'tool-call';
+        text?: string;
+        toolCallId?: string;
+        toolName?: string;
+        args?: unknown;
+      }>;
+      for (const content of contentArray) {
         if (content.type === 'text') {
-          textContent += content.text;
+          textContent += content.text ?? '';
         } else if (content.type === 'tool-call') {
           toolInvocations.push({
             state: 'call',
-            toolCallId: content.toolCallId,
-            toolName: content.toolName,
-            args: content.args,
+            toolCallId: content.toolCallId!,
+            toolName: content.toolName!,
+            args: content.args!,
           });
         }
       }
