@@ -90,7 +90,7 @@ export function convertToUIMessages(
   return messages.reduce((chatMessages: Array<Message>, message) => {
     if (message.role === 'tool') {
       return addToolMessageToChat({
-        toolMessage: message as CoreToolMessage,
+        toolMessage: message as unknown as CoreToolMessage,
         messages: chatMessages,
       });
     }
