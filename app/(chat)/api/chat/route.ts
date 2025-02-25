@@ -149,19 +149,20 @@ export async function POST(request: Request) {
       // Fetch relevant context first
       let contextDocs: any[] = [];
       try {
-        // Get the base URL, preferring NEXT_PUBLIC_APP_URL
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                       `https://${process.env.VERCEL_URL}` || 
-                       'http://localhost:3000';
-                       
-        // Create absolute URL for RAG endpoint
-        const ragUrl = new URL('/api/rag', baseUrl).toString();
+        // In production, we can use the request URL's origin
+        // In development, we'll use localhost
+        const isProduction = process.env.NODE_ENV === 'production';
+        const baseUrl = isProduction 
+          ? 'https://alex.homeofhandball.com'
+          : 'http://localhost:3000';
+
+        console.log('Using base URL:', baseUrl);
         
-        console.log('Calling RAG endpoint:', ragUrl);
-        
-        const response = await fetch(ragUrl, {
+        const response = await fetch(`${baseUrl}/api/rag`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({ 
             query: typeof userMessage.content === 'string' 
               ? userMessage.content 
@@ -181,9 +182,9 @@ export async function POST(request: Request) {
         }
       } catch (error) {
         console.error('Failed to fetch context:', error);
-        console.error('Error details:', {
-          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-          VERCEL_URL: process.env.VERCEL_URL
+        console.error('Environment:', {
+          NODE_ENV: process.env.NODE_ENV,
+          isProduction: process.env.NODE_ENV === 'production'
         });
         contextDocs = [];
       }
