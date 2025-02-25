@@ -20,17 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 
-const PurePreviewMessage = ({
-  chatId,
-  message,
-  vote,
-  isLoading,
-  setMessages,
-  reload,
-  isReadonly,
-  isBlockVisible,
-  hideVotes = true,
-}: {
+interface PreviewMessageProps {
   chatId: string;
   message: Message;
   vote: Vote | undefined;
@@ -44,7 +34,19 @@ const PurePreviewMessage = ({
   isReadonly: boolean;
   isBlockVisible: boolean;
   hideVotes?: boolean;
-}) => {
+}
+
+const PurePreviewMessage = ({
+  chatId,
+  message,
+  vote,
+  isLoading,
+  setMessages,
+  reload,
+  isReadonly,
+  isBlockVisible,
+  hideVotes = true,
+}: PreviewMessageProps) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
   return (
@@ -222,6 +224,7 @@ export const PreviewMessage = memo(
     )
       return false;
     if (!equal(prevProps.vote, nextProps.vote)) return false;
+    if (prevProps.isBlockVisible !== nextProps.isBlockVisible) return false;
 
     return true;
   },
@@ -258,42 +261,3 @@ export const ThinkingMessage = () => {
     </motion.div>
   );
 };
-
-export function Message({
-  message,
-  isLoading,
-  isLast,
-  reload,
-  vote,
-  isReadonly,
-  isBlockVisible,
-  hideVotes = true,
-}: {
-  message: Message;
-  isLoading: boolean;
-  isLast: boolean;
-  reload: () => void;
-  vote?: Vote;
-  isReadonly: boolean;
-  isBlockVisible: boolean;
-  hideVotes?: boolean;
-}) {
-  // ... rest of the component code
-
-  return (
-    <div className={cn('group relative mb-4 flex items-start md:mb-6', className)}>
-      {/* ... other message content ... */}
-
-      {message.role === 'assistant' && !hideVotes && (
-        <div className="absolute -left-10 top-2 hidden -translate-x-full group-hover:flex items-center gap-1.5">
-          <MessageActions
-            messageId={message.id}
-            vote={vote}
-            isLast={isLast}
-            reload={reload}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
