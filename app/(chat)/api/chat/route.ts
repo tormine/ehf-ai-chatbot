@@ -149,7 +149,17 @@ export async function POST(request: Request) {
       // Fetch relevant context first
       let contextDocs: any[] = [];
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/rag`, {
+        // Get the base URL, preferring NEXT_PUBLIC_APP_URL
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                       `https://${process.env.VERCEL_URL}` || 
+                       'http://localhost:3000';
+                       
+        // Create absolute URL for RAG endpoint
+        const ragUrl = new URL('/api/rag', baseUrl).toString();
+        
+        console.log('Calling RAG endpoint:', ragUrl);
+        
+        const response = await fetch(ragUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -171,6 +181,10 @@ export async function POST(request: Request) {
         }
       } catch (error) {
         console.error('Failed to fetch context:', error);
+        console.error('Error details:', {
+          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+          VERCEL_URL: process.env.VERCEL_URL
+        });
         contextDocs = [];
       }
 
