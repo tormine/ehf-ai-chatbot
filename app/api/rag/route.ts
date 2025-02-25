@@ -33,14 +33,14 @@ export async function POST(
       throw new Error('Please include a "query" field in your JSON body.');
     }
 
-    // Get Pinecone index - using the index name directly
-    const pineconeIndex = pinecone.index('ehfbot-v1');
+    // Get Pinecone index
+    const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX_NAME);
 
-    // Setup embeddings with a specific model
+    // Setup embeddings
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
-      modelName: 'text-embedding-3-small', // Use the latest embedding model
-      dimensions: 1536, // Match your Pinecone index dimensions
+      modelName: 'text-embedding-3-small',
+      dimensions: 1536,
     });
 
     // Setup the vector store
@@ -48,8 +48,11 @@ export async function POST(
       pineconeIndex,
     });
 
-    // Perform RAG retrieval
-    const results = await vectorStore.similaritySearch(query, 3);
+    // Enhance query for better context matching
+    const enhancedQuery = `EHF RINCK Convention: ${query}`;
+    
+    // Perform similarity search
+    const results = await vectorStore.similaritySearch(enhancedQuery, 5);
 
     return NextResponse.json({ results });
   } catch (error) {

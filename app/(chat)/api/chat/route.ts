@@ -152,15 +152,26 @@ export async function POST(request: Request) {
         const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/rag`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: userMessage.content }),
+          body: JSON.stringify({ 
+            query: typeof userMessage.content === 'string' 
+              ? userMessage.content 
+              : Array.isArray(userMessage.content)
+                ? userMessage.content.map(getPartContent).join(' ')
+                : ''
+          }),
         });
 
-        if (response.ok) {
+        if (!response.ok) {
+          console.error('RAG response not ok:', await response.text());
+          contextDocs = [];
+        } else {
           const data = await response.json();
           contextDocs = data.results;
+          console.log('Retrieved context:', contextDocs);
         }
       } catch (error) {
         console.error('Failed to fetch context:', error);
+        contextDocs = [];
       }
 
       const result = streamText({
@@ -168,6 +179,7 @@ export async function POST(request: Request) {
         system: buildSystemPrompt(contextDocs),
         messages: coreMessages,
         maxSteps: 5,
+        temperature: 0.7,
         experimental_activeTools: allTools,
         tools: {
           getWeather: {

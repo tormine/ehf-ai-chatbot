@@ -112,17 +112,23 @@ ${content}
 Please update it based on the user's request. Maintain the same style and format.`;
 
 export function buildSystemPrompt(context: Document[] | any[]): string {
-  if (!context.length) return SYSTEM_PROMPT;
+  if (!context.length) {
+    console.log('No context found from RAG');
+    return SYSTEM_PROMPT;
+  }
 
   const contextText = context
-    .map(doc => doc.pageContent || '')
+    .map(doc => {
+      console.log('Using context:', doc.pageContent);
+      return doc.pageContent || '';
+    })
     .join('\n\n');
 
   return `${SYSTEM_PROMPT}
 
-Here is some relevant context to help answer the question:
+Here is some relevant context from the EHF knowledge base:
 
 ${contextText}
 
-Use this context to inform your response, but you can also draw on your general knowledge when appropriate.`;
+Please use this context to provide accurate, specific answers. When the context doesn't fully address the question, you can combine it with your general knowledge about handball coaching.`;
 }
