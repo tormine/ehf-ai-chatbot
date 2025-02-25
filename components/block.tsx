@@ -334,7 +334,8 @@ function PureBlock({
                   setMessages={setMessages}
                   reload={reload}
                   isReadonly={isReadonly}
-                  blockStatus={block.status}
+                  isBlockVisible={true}
+                  hideVotes={true}
                 />
 
                 <form className="flex flex-row gap-2 relative items-end w-full px-4 pb-4">

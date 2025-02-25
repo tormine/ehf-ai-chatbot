@@ -18,7 +18,8 @@ interface BlockMessagesProps {
     chatRequestOptions?: ChatRequestOptions,
   ) => Promise<string | null | undefined>;
   isReadonly: boolean;
-  blockStatus: UIBlock['status'];
+  isBlockVisible: boolean;
+  hideVotes?: boolean;
 }
 
 function PureBlockMessages({
@@ -29,6 +30,8 @@ function PureBlockMessages({
   setMessages,
   reload,
   isReadonly,
+  isBlockVisible,
+  hideVotes = true,
 }: BlockMessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -52,6 +55,8 @@ function PureBlockMessages({
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
+          isBlockVisible={isBlockVisible}
+          hideVotes={hideVotes}
         />
       ))}
 
@@ -77,6 +82,7 @@ function areEqual(
   if (prevProps.isLoading && nextProps.isLoading) return false;
   if (prevProps.messages.length !== nextProps.messages.length) return false;
   if (!equal(prevProps.votes, nextProps.votes)) return false;
+  if (prevProps.isBlockVisible !== nextProps.isBlockVisible) return false;
 
   return true;
 }
