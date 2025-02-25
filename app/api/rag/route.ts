@@ -34,7 +34,7 @@ export async function POST(
     }
 
     // Get Pinecone index - using the index name directly
-    const pineconeIndex = pinecone.index('ehfbot');
+    const pineconeIndex = pinecone.index('ehfbot-v1');
 
     // Setup embeddings with a specific model
     const embeddings = new OpenAIEmbeddings({

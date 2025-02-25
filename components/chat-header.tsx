@@ -39,9 +39,9 @@ function PureChatHeader({
         </Button>
 
         <div className="flex items-center gap-2 py-1.5 px-2 h-[34px] order-2 ml-auto">
-          <Image src="/favicon.ico" alt="Charly" width={16} height={16} />
+          <Image src="/favicon.ico" alt="Alex" width={16} height={16} />
           <span className="font-semibold hidden md:inline">
-            Charly, the Home of Handball AI
+            Alex, the Home of Handball AI
           </span>
         </div>
       </header>
@@ -49,7 +49,7 @@ function PureChatHeader({
       {messages.length === 0 && (
         <div className="flex flex-col items-center justify-center px-4 py-8">
           <div className="max-w-2xl text-center space-y-4">
-            <h1 className="text-2xl font-bold">👋 Hi! I&apos;m Charly</h1>
+            <h1 className="text-2xl font-bold">👋 Hi! I&apos;m Alex</h1>
             <p className="text-muted-foreground">
               I can help you understand handball coaching education, especially the RINCK Convention and EHF guidelines. Feel free to ask me anything about handball coaching or browse the example questions below!
             </p>
