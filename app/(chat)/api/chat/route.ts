@@ -193,8 +193,9 @@ export async function POST(request: Request) {
         model: customModel(model.apiIdentifier),
         system: buildSystemPrompt(contextDocs),
         messages: coreMessages,
-        maxSteps: 5,
-        temperature: 0.7,
+        maxTokens: 4000,
+        maxSteps: 10,
+        temperature: 0.1,
         experimental_activeTools: allTools,
         tools: {
           getWeather: {

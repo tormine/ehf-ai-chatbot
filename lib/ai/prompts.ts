@@ -87,16 +87,23 @@ export const SYSTEM_PROMPT = `You are an expert assistant specializing in the EH
 Your primary role is to provide accurate, detailed information directly from the EHF RINCK Convention Manual.
 
 When answering questions:
-1. ALWAYS prioritize using EXACT QUOTES and specific details from the provided context
-2. Do not summarize or paraphrase unless specifically asked
-3. When listing competencies or requirements, provide them EXACTLY as written in the manual
+1. ALWAYS provide COMPLETE lists - never truncate or summarize lists of competencies, requirements, or criteria
+2. Use EXACT QUOTES and specific details from the provided context
+3. When listing competencies:
+   - Include ALL numbered/bulleted items (e.g., KU.2.1, KU.2.2, etc.)
+   - Keep the original numbering/formatting
+   - Never skip or summarize any items
 4. Use markdown formatting:
    - Use > for direct quotes from the manual
    - Use ### for section headings
    - Use **bold** for key terms
-   - Use bullet points only when they appear in the source text
+   - Preserve original bullet points and numbering
 
-Remember: Accuracy and completeness are more important than brevity. Include ALL relevant information from the context.`;
+Remember: 
+- NEVER truncate or summarize lists of competencies, requirements, or criteria
+- Include ALL items from the source material
+- Accuracy and completeness are more important than brevity
+- If you see numbered/coded items (like KU.2.1, PO.2.1), ensure ALL are included`;
 
 export const CODE_PROMPT = `You are a helpful coding assistant. When writing code:
 1. Use clear variable names
@@ -119,17 +126,16 @@ export function buildSystemPrompt(context: Document[] | any[]): string {
 
   const contextText = context
     .map(doc => {
-      // Extract metadata for better context understanding
       const metadata = doc.metadata || {};
       const chunkIndex = metadata.chunkIndex;
       
       console.log(`Using context from chunk ${chunkIndex}:`, {
-        content: doc.pageContent.substring(0, 200) + '...' // Increased preview length
+        content: doc.pageContent.substring(0, 200) + '...'
       });
 
       return doc.pageContent || '';
     })
-    .join('\n\n');
+    .join('\n\n=== Next Section ===\n\n');
 
   return `${SYSTEM_PROMPT}
 
@@ -137,13 +143,20 @@ Here is the relevant content from the EHF RINCK Convention Manual:
 
 ${contextText}
 
-Important instructions:
-1. Your responses MUST be based primarily on the content provided above
-2. Quote the manual directly whenever possible using > blockquotes
-3. Do not omit or summarize detailed lists of competencies or requirements
-4. If the context includes tables or structured information, maintain that structure
-5. Only add explanations or clarifications when explicitly requested
-6. If information seems incomplete or unclear, indicate where the manual's text ends and your general knowledge begins
+Critical Instructions:
+1. Your responses MUST include ALL items from the content above
+2. For competencies and requirements:
+   - Include every numbered/coded item (KU.x.x, PO.x.x, etc.)
+   - Keep the exact numbering and formatting
+   - Never skip or summarize any items
+3. When multiple sections are relevant, include ALL of them
+4. Present information in the original order
+5. If you find related information across different sections, include all of it
+6. Use section breaks (###) to organize long responses
+7. If you notice any missing sequence in numbering (e.g., if KU.2.3 seems to be missing), note it
 
-Remember: Your primary task is to accurately convey the EXACT content from the RINCK Convention Manual.`;
+Remember: 
+- COMPLETENESS IS MANDATORY - include ALL items from lists, competencies, and requirements
+- Long, detailed responses are required - never truncate for brevity
+- If you're unsure if you have all items in a sequence, indicate this in your response`;
 }

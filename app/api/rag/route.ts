@@ -51,8 +51,13 @@ export async function POST(
     // Enhance query for better context matching
     const enhancedQuery = `EHF RINCK Convention: ${query}`;
     
-    // Perform similarity search
-    const results = await vectorStore.similaritySearch(enhancedQuery, 5);
+    // Perform similarity search with more results and no filter
+    const results = await vectorStore.similaritySearch(enhancedQuery, 15);
+
+    // Log the results to help debug
+    console.log('RAG Query:', enhancedQuery);
+    console.log('Number of chunks found:', results.length);
+    console.log('First chunk preview:', results[0]?.pageContent.substring(0, 200));
 
     return NextResponse.json({ results });
   } catch (error) {
