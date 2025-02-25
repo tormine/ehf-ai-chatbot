@@ -119,16 +119,33 @@ export function buildSystemPrompt(context: Document[] | any[]): string {
 
   const contextText = context
     .map(doc => {
-      console.log('Using context:', doc.pageContent);
+      // Extract metadata for better context understanding
+      const metadata = doc.metadata || {};
+      const chunkIndex = metadata.chunkIndex;
+      const imageTags = metadata.imageTags || [];
+      
+      // Log what we're using
+      console.log(`Using context from chunk ${chunkIndex}:`, {
+        content: doc.pageContent.substring(0, 100) + '...',
+        tags: imageTags
+      });
+
       return doc.pageContent || '';
     })
     .join('\n\n');
 
   return `${SYSTEM_PROMPT}
 
-Here is some relevant context from the EHF knowledge base:
+Here is some relevant context from the EHF RINCK Convention Manual:
 
 ${contextText}
 
-Please use this context to provide accurate, specific answers. When the context doesn't fully address the question, you can combine it with your general knowledge about handball coaching.`;
+Instructions for using this context:
+1. Prioritize information from the provided context when answering questions
+2. When citing specific parts of the RINCK Convention, use direct quotes where appropriate
+3. If the context doesn't fully address the question, you can combine it with your general knowledge about handball coaching
+4. If you're unsure about something, acknowledge the uncertainty and stick to what's in the context
+5. Keep responses focused and specific to handball coaching education and the RINCK Convention
+
+Remember to maintain a professional tone while being clear and concise.`;
 }
