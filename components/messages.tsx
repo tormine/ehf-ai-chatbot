@@ -19,6 +19,7 @@ interface MessagesProps {
   ) => Promise<string | null | undefined>;
   isReadonly: boolean;
   isBlockVisible: boolean;
+  hideVotes?: boolean;
 }
 
 function PureMessages({
@@ -29,6 +30,8 @@ function PureMessages({
   setMessages,
   reload,
   isReadonly,
+  isBlockVisible,
+  hideVotes = true,
 }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -54,6 +57,8 @@ function PureMessages({
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
+          isBlockVisible={isBlockVisible}
+          hideVotes={hideVotes}
         />
       ))}
 
