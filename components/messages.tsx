@@ -49,11 +49,7 @@ function PureMessages({
           chatId={chatId}
           message={message}
           isLoading={isLoading && messages.length - 1 === index}
-          vote={
-            votes
-              ? votes.find((vote) => vote.messageId === message.id)
-              : undefined
-          }
+          vote={votes?.find((vote) => vote.messageId === message.id)}
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
